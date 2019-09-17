@@ -22,7 +22,7 @@ ExPaint.clear(image, Color.black())
 
 ExPaint.text(image, {10, 10}, label_font, "This is text", Color.white())
 
-ExPaint.rectangle(image, {10, 10}, {40,20}, Color.white())
+ExPaint.filled_rect(image, {10, 10}, {40,20}, %Color{r: 230, g: 12, b: 34})
 
 # Write to a png
 File.write("foo.png", ExPaint.png(image))
@@ -33,11 +33,6 @@ ExPaint.inline(image)
 # If you're pairing with https://github.com/mtrudel/ssd1322
 SSD1322.draw(session, ExPaint.render(image, :four_bit_greyscale))
 ```
-
-## Credits
-
-For ease of installation, this package includes the contents of [this collection of
-fonts](https://github.com/SteveAlexander/wingsfonts) in the `/priv/fonts/` folder.
 
 ## Installation
 
@@ -54,3 +49,7 @@ end
 
 Docs can be found at [https://hexdocs.pm/ex_paint](https://hexdocs.pm/ex_paint).
 
+## Credits
+
+For ease of installation, this package includes the contents of [this collection of
+fonts](https://github.com/SteveAlexander/wingsfonts) in the `/priv/fonts/` folder.
