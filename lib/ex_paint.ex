@@ -3,51 +3,22 @@ defmodule ExPaint do
 
   use Bitwise, only_operators: true
 
-  alias ExPaint.{Image, Font, Color}
+  alias ExPaint.Image
 
   def create(w, h) when is_number(w) and is_number(h) do
-    %Image{w: w, h: h, data: :egd.create(w, h)}
+    Image.start_link(width: w, height: h)
   end
 
-  def destroy(%Image{data: data}) do
-    :egd.destroy(data)
-  end
-
-  def clear(%Image{w: w, h: h} = image, color \\ Color.black()) do
-    filled_rect(image, {0, 0}, {w, h}, color)
-  end
-
-  def line(%Image{data: data}, p1, p2, %Color{r: r, g: g, b: b}) do
-    :egd.line(data, p1, p2, :egd.color({r, g, b}))
-  end
-
-  def text(%Image{data: data}, p, %Font{font: font}, text, %Color{r: r, g: g, b: b}) do
-    :egd.text(data, p, font, to_charlist(text), :egd.color({r, g, b}))
-  end
-
-  def rect(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.rectangle(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
-
-  def filled_rect(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.filledRectangle(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
-
-  def filled_ellipse(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.filledEllipse(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
-
-  def filled_triangle(%Image{data: data}, p1, p2, p3, %Color{r: r, g: g, b: b}) do
-    :egd.filledTriangle(data, p1, p2, p3, :egd.color({r, g, b}))
-  end
-
-  def polygon(%Image{data: data}, points, %Color{r: r, g: g, b: b}) do
-    :egd.polygon(data, points, :egd.color({r, g, b}))
-  end
-
-  def arc(%Image{data: data}, p1, p2, diam, %Color{r: r, g: g, b: b}) do
-    :egd.arc(data, p1, p2, diam, :egd.color({r, g, b}))
-  end
+  defdelegate destroy(image), to: Image
+  defdelegate clear(image), to: Image
+  defdelegate line(image, p1, p2, color), to: Image
+  defdelegate rect(image, p, size, color), to: Image
+  defdelegate filled_rect(image, p, size, color), to: Image
+  defdelegate filled_ellipse(image, p, size, color), to: Image
+  defdelegate filled_triangle(image, p1, p2, p3, color), to: Image
+  defdelegate polygon(image, points, color), to: Image
+  defdelegate arc(image, p1, p2, diam, color), to: Image
+  defdelegate text(image, p, font, text, color), to: Image
 
   def render(image, format \\ :rgb_binary)
 
