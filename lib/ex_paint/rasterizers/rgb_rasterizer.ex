@@ -13,18 +13,18 @@ defmodule ExPaint.RGBRasterizer do
     state
   end
 
-  def apply(%ExPaint.Rect{p: p, size: size, color: color}, state) do
-    :egd.rectangle(state, p, size, egd_color(color))
+  def apply(%ExPaint.Rect{p: {x, y} = p, size: {w, h}, color: color}, state) do
+    :egd.rectangle(state, p, {x + w - 1, y + h - 1}, egd_color(color))
     state
   end
 
-  def apply(%ExPaint.FilledRect{p: p, size: size, color: color}, state) do
-    :egd.filledRectangle(state, p, size, egd_color(color))
+  def apply(%ExPaint.FilledRect{p: {x, y} = p, size: {w, h}, color: color}, state) do
+    :egd.filledRectangle(state, p, {x + w - 1, y + h - 1}, egd_color(color))
     state
   end
 
-  def apply(%ExPaint.FilledEllipse{p: p, size: size, color: color}, state) do
-    :egd.filledEllipse(state, p, size, egd_color(color))
+  def apply(%ExPaint.FilledEllipse{p: {x, y} = p, size: {w, h}, color: color}, state) do
+    :egd.filledEllipse(state, p, {x + w - 1, y + h - 1}, egd_color(color))
     state
   end
 
