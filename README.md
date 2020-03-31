@@ -15,14 +15,17 @@ store using something like a piece table of binaries to provide performant compo
 ## Usage
 
 ```elixir
-image = ExPaint.create(256, 64)
-font = Font.load("Helvetica22")
+alias ExPaint.{Font, Color}
+
+image = ExPaint.create(128, 64)
+font = Font.load("Helvetica20")
 
 ExPaint.clear(image, Color.black())
 
-ExPaint.text(image, {10, 10}, label_font, "This is text", Color.white())
-
-ExPaint.filled_rect(image, {10, 10}, {40,20}, %Color{r: 230, g: 12, b: 34})
+ExPaint.text(image, {10, 30}, font, "Hello World", Color.white())
+ExPaint.filled_rect(image, {10, 10}, {20,20}, %Color{r: 230, g: 12, b: 34})
+ExPaint.filled_ellipse(image, {50, 10}, {20,20}, %Color{r: 12, g: 12, b: 230})
+ExPaint.filled_triangle(image, {90, 30}, {100, 10}, {110, 30}, %Color{r: 230, g: 230, b: 34})
 
 # Write to a png
 File.write("foo.png", ExPaint.png(image))
@@ -34,9 +37,14 @@ ExPaint.inline(image)
 SSD1322.draw(session, ExPaint.render(image, :four_bit_greyscale))
 ```
 
+will render the following image:
+
+![foo](https://user-images.githubusercontent.com/79646/78073774-864d5300-736f-11ea-9acb-8eff03b20a22.png)
+
+
 ## Installation
 
-This package can be installed by adding `ex_paint` and 'egd' to your list of dependencies in `mix.exs`:
+This package can be installed by adding `ex_paint` and `egd` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
