@@ -17,24 +17,24 @@ store using something like a piece table of binaries to provide performant compo
 ```elixir
 alias ExPaint.{Font, Color}
 
-image = ExPaint.create(128, 64)
+{:ok, image} = ExPaint.create(128, 64)
 font = Font.load("Helvetica20")
 
-ExPaint.clear(image, Color.black())
+ExPaint.clear(image)
 
-ExPaint.text(image, {10, 30}, font, "Hello World", Color.white())
+ExPaint.text(image, {10, 30}, font, "Hello World", Color.black())
 ExPaint.filled_rect(image, {10, 10}, {20,20}, %Color{r: 230, g: 12, b: 34})
 ExPaint.filled_ellipse(image, {50, 10}, {20,20}, %Color{r: 12, g: 12, b: 230})
 ExPaint.filled_triangle(image, {90, 30}, {100, 10}, {110, 30}, %Color{r: 230, g: 230, b: 34})
 
 # Write to a png
-File.write("foo.png", ExPaint.png(image))
+File.write("foo.png", ExPaint.render(image, ExPaint.PNGRasterizer))
 
 # If you're in iTerm, display inline
-ExPaint.inline(image)
+ExPaint.render(image, ExPaint.InlineRasterizer)
 
 # If you're pairing with https://github.com/mtrudel/ssd1322
-SSD1322.draw(session, ExPaint.render(image, :four_bit_greyscale))
+SSD1322.draw(session, ExPaint.render(image, ExPaint.FourBitGreyscaleRasterizer))
 ```
 
 will render the following image:

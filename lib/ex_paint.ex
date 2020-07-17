@@ -1,78 +1,148 @@
 defmodule ExPaint do
-  @moduledoc false
+  @moduledoc """
+  ExPaint provides simple primitive based drawing abilities with a flexible backend
+  system for raterizing.
+  """
 
-  use Bitwise, only_operators: true
+  alias ExPaint.Image
 
-  alias ExPaint.{Image, Font, Color}
-
+  @doc """
+  Creates an image reference of the given size into which primitives may be 
+  drawn, and which may be rendered to a given format.
+  """
   def create(w, h) when is_number(w) and is_number(h) do
-    %Image{w: w, h: h, data: :egd.create(w, h)}
+    Image.start_link(width: w, height: h)
   end
 
-  def destroy(%Image{data: data}) do
-    :egd.destroy(data)
-  end
+  @doc """
+  Frees the internal resources being used by the given image.
+  """
+  defdelegate destroy(image), to: Image
 
-  def clear(%Image{w: w, h: h} = image, color \\ Color.black()) do
-    filled_rect(image, {0, 0}, {w, h}, color)
-  end
+  @doc """
+  Removes all queued drawing primitives for this image. Images have an 
+  all-white background when empty.
+  """
+  defdelegate clear(image), to: Image
 
-  def line(%Image{data: data}, p1, p2, %Color{r: r, g: g, b: b}) do
-    :egd.line(data, p1, p2, :egd.color({r, g, b}))
-  end
+  @doc """
+  Enqueues a line from p1 to p2 of the given color
 
-  def text(%Image{data: data}, p, %Font{font: font}, text, %Color{r: r, g: g, b: b}) do
-    :egd.text(data, p, font, to_charlist(text), :egd.color({r, g, b}))
-  end
+  ## Parameters
 
-  def rect(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.rectangle(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
+  * image: An image reference to draw into
+  * p1: A `{x,y}` integer tuple of the starting point of the line
+  * p2: A `{x,y}` integer tuple of the ending point of the line
+  * color: A ExPaint.Color struct describing the color of the line
+  """
+  defdelegate line(image, p1, p2, color), to: Image
 
-  def filled_rect(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.filledRectangle(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
+  @doc """
+  Enqueues a rect of the given size and color whose upper left corner is at p
 
-  def filled_ellipse(%Image{data: data}, {x, y}, {w, h}, %Color{r: r, g: g, b: b}) do
-    :egd.filledEllipse(data, {x, y}, {x + w - 1, y + h - 1}, :egd.color({r, g, b}))
-  end
+  ## Parameters
 
-  def filled_triangle(%Image{data: data}, p1, p2, p3, %Color{r: r, g: g, b: b}) do
-    :egd.filledTriangle(data, p1, p2, p3, :egd.color({r, g, b}))
-  end
+  * image: An image reference to draw into
+  * p: A `{x,y}` integer tuple of the upper left corner of the rectangle
+  * size: A `{w,h}` integer tuple of the outer size of the rectangle
+  * color: A ExPaint.Color struct describing the color of the rectangle's border
+  """
+  defdelegate rect(image, p, size, color), to: Image
 
-  def polygon(%Image{data: data}, points, %Color{r: r, g: g, b: b}) do
-    :egd.polygon(data, points, :egd.color({r, g, b}))
-  end
+  @doc """
+  Enqueues a filled rect of the given size and color whose upper left corner 
+  is at p
 
-  def arc(%Image{data: data}, p1, p2, diam, %Color{r: r, g: g, b: b}) do
-    :egd.arc(data, p1, p2, diam, :egd.color({r, g, b}))
-  end
+  ## Parameters
 
-  def render(image, format \\ :rgb_binary)
+  * image: An image reference to draw into
+  * p: A `{x,y}` integer tuple of the upper left corner of the rectangle
+  * size: A `{w,h}` integer tuple of the outer size of the rectangle
+  * color: A ExPaint.Color struct describing the color of the rectangle's fill
+  """
+  defdelegate filled_rect(image, p, size, color), to: Image
 
-  def render(%Image{data: data}, :rgb_binary) do
-    :egd.render(data, :raw_bitmap)
-  end
+  @doc """
+  Enqueues a filled ellipse of the given size and color whose bounding box's upper left 
+  corner is at p 
 
-  def render(%Image{} = image, :four_bit_greyscale) do
+  ## Parameters
+
+  * image: An image reference to draw into
+  * p: A `{x,y}` integer tuple of the upper left corner of the ellipse's bounding box
+  * size: A `{w,h}` integer tuple of the outer size of the ellipse's bounding box
+  * color: A ExPaint.Color struct describing the color of the ellipse's fill
+  """
+  defdelegate filled_ellipse(image, p, size, color), to: Image
+
+  @doc """
+  Enqueues a filled triangle of the given color with the specified vertices. Winding
+  of the vertices does not matter
+
+  ## Parameters
+
+  * image: An image reference to draw into
+  * p1: A `{x,y}` integer tuple of the first point of the triangle
+  * p2: A `{x,y}` integer tuple of the second point of the triangle
+  * p3: A `{x,y}` integer tuple of the third point of the triangle
+  * color: A ExPaint.Color struct describing the color of the triangle's fill
+  """
+  defdelegate filled_triangle(image, p1, p2, p3, color), to: Image
+
+  @doc """
+  Enqueues a polygon with an arbitrary number of vertices. Winding of the vertices 
+  does not matter
+
+  ## Parameters
+
+  * image: An image reference to draw into
+  * points: A list of `{x,y}` integer tuples, one for each vertex
+  * color: A ExPaint.Color struct describing the color of the polygon's border
+  """
+  defdelegate polygon(image, points, color), to: Image
+
+  @doc """
+  Enqueues an arc with the given two points on its radius and the given diameter
+
+  ## Parameters
+
+  * image: An image reference to draw into
+  * p1: A `{x,y}` integer tuple of a point on the arc's raduis
+  * p2: A `{x,y}` integer tuple of a second point on the arc's raduis
+  * diam: An integer value for the arc's diameter
+  * color: A ExPaint.Color struct describing the color of the arc's border
+  """
+  defdelegate arc(image, p1, p2, diam, color), to: Image
+
+  @doc """
+  Enqueues a text string 
+
+  Parameters:
+  * image: An image reference to draw into
+  * p: A `{x,y}` integer tuple of the upper left point of the text's bounding box
+  * font: A ExPaint.Font struct describing the font to use
+  * text: The string to display
+  * color: A ExPaint.Color struct describing the color of the text
+  """
+  defdelegate text(image, p, font, text, color), to: Image
+
+  @doc """
+  Renders the given image according to the given rasterizer
+
+  ## Parameters
+
+  * image: An image reference to draw into
+  * rasterizer: The rasterizer module to use to produce the output.
+
+  ## Examples
+
+  iex> ExPaint.render(image, ExPaint.PNGRasterizer)
+       {:ok, png_data}
+  """
+  def render(image, rasterizer) do
     image
-    |> render
-    |> Stream.unfold(fn
-      <<r, g, b, rest::binary>> -> {round(0.21 * r + 0.72 * g + 0.07 * b), rest}
-      <<>> -> nil
-    end)
-    |> Enum.reduce(<<>>, fn b, acc -> <<acc::bitstring, b >>> 4::4>> end)
-  end
-
-  def png(%Image{data: data}) do
-    :egd.render(data, :png)
-  end
-
-  def inline(%Image{w: w, h: h} = image) do
-    IO.write(
-      :stderr,
-      "\e]1337;File=inline=1;width=#{w}px;height=#{h}px:#{image |> png |> Base.encode64()}\a\n"
-    )
+    |> Image.primitives()
+    |> Enum.reduce(rasterizer.start(image), &rasterizer.apply/2)
+    |> rasterizer.commit
   end
 end
