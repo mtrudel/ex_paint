@@ -1,7 +1,6 @@
 # ExPaint
 
 [![Build Status](https://travis-ci.org/mtrudel/ex_paint.svg?branch=master)](https://travis-ci.org/mtrudel/ex_paint)
-[![Inline docs](http://inch-ci.org/github/mtrudel/ex_paint.svg?branch=master&style=flat)](http://inch-ci.org/github/mtrudel/ex_paint)
 [![Hex.pm](https://img.shields.io/hexpm/v/ex_paint.svg?style=flat-square)](https://hex.pm/packages/ex_paint)
 
 ExPaint is a simple 2D rasterizer, based (for now, at least) on the [egd](https://github.com/erlang/egd) library.
@@ -28,18 +27,20 @@ ExPaint.filled_ellipse(image, {50, 10}, {20,20}, %Color{r: 12, g: 12, b: 230})
 ExPaint.filled_triangle(image, {90, 30}, {100, 10}, {110, 30}, %Color{r: 230, g: 230, b: 34})
 
 # Write to a png
-File.write("foo.png", ExPaint.render(image, ExPaint.PNGRasterizer))
+{:ok, png_data} = ExPaint.render(image, ExPaint.PNGRasterizer)
+File.write("foo.png", png_data)
 
 # If you're in iTerm, display inline
 ExPaint.render(image, ExPaint.InlineRasterizer)
 
 # If you're pairing with https://github.com/mtrudel/ssd1322
-SSD1322.draw(session, ExPaint.render(image, ExPaint.FourBitGreyscaleRasterizer))
+{:ok, four_bit_data} = ExPaint.render(image, ExPaint.FourBitGreyscaleRasterizer)
+SSD1322.draw(session, four_bit_data)
 ```
 
 will render the following image:
 
-![foo](https://user-images.githubusercontent.com/79646/78073774-864d5300-736f-11ea-9acb-8eff03b20a22.png)
+![foo](https://user-images.githubusercontent.com/79646/87735987-0378c880-c7a5-11ea-9bbf-168637db7381.png)
 
 
 ## Installation
@@ -49,7 +50,7 @@ This package can be installed by adding `ex_paint` and `egd` to your list of dep
 ```elixir
 def deps do
   [
-    {:ex_paint, "~> 0.1.0"},
+    {:ex_paint, "~> 0.2.0"},
     {:egd, github: "erlang/egd"}
   ]
 end
