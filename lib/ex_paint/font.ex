@@ -3,7 +3,7 @@ defmodule ExPaint.Font do
 
   def load(fontname) do
     %__MODULE__{
-      font: :egd_font.load(Application.app_dir(:ex_paint, "priv/fonts/#{fontname}.wingsfont"))
+      font: :egd_font.load(Path.join(:code.priv_dir(:ex_paint), "fonts/#{fontname}.wingsfont"))
     }
   end
 
