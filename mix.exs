@@ -32,7 +32,7 @@ defmodule ExPaint.MixProject do
 
   defp package() do
     [
-      files: ["lib", "test", "mix.exs", "README*", "LICENSE*"],
+      files: ["lib", "priv", "test", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Mat Trudel"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/mtrudel/ex_paint"}
