@@ -15,6 +15,6 @@ defmodule ExPaint.Font do
   """
   def size(%__MODULE__{font: font}, descender_height \\ 0.3) do
     {width, cap_height} = :egd_font.size(font)
-    {width, cap_height * (1 + descender_height)}
+    {width, ceil(cap_height * (1 + descender_height))}
   end
 end
