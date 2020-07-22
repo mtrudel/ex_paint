@@ -7,7 +7,14 @@ defmodule ExPaint.Font do
     }
   end
 
-  def size(%__MODULE__{font: font}) do
-    :egd_font.size(font)
+  @doc """
+  Returns the (fixed) size of a glyph. Our underlying font library
+  only seems to care about cap height, and so doesn't take into account descenders. 
+  We add a descender height to the returned size as passed in, defaulting to 0.3 of
+  cap height
+  """
+  def size(%__MODULE__{font: font}, descender_height \\ 0.3) do
+    {width, cap_height} = :egd_font.size(font)
+    {width, cap_height * (1 + descender_height)}
   end
 end
